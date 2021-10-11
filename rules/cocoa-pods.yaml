@@ -1,0 +1,9 @@
+name: "CocoaPods"
+enabled: true
+searchPaths: ["~"]
+ignorePaths: []
+ruleType: "file-trigger"
+ruleSettings:
+  fileTrigger: "Podfile"
+  excludePaths:
+    - "Pods"

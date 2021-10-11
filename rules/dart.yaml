@@ -1,0 +1,11 @@
+name: "dart"
+enabled: true
+searchPaths: ["~"]
+ignorePaths: []
+ruleType: "file-trigger"
+ruleSettings:
+  fileTrigger: "pubspec.yaml"
+  excludePaths:
+    - ".dart_tool"
+    - ".packages"
+    - "build"

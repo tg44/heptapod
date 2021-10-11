@@ -1,0 +1,10 @@
+name: "gradle"
+enabled: true
+searchPaths: ["~"]
+ignorePaths: []
+ruleType: "file-trigger"
+ruleSettings:
+  fileTrigger: "build.gradle"
+  excludePaths:
+    - ".gradle"
+    - "gradle"

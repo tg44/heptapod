@@ -1,0 +1,10 @@
+name: "gradle-kotlin"
+enabled: true
+searchPaths: ["~"]
+ignorePaths: []
+ruleType: "file-trigger"
+ruleSettings:
+  fileTrigger: "build.gradle.kts"
+  excludePaths:
+    - ".gradle"
+    - "gradle"

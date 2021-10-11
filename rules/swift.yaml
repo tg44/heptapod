@@ -1,0 +1,9 @@
+name: "swift"
+enabled: true
+searchPaths: ["~"]
+ignorePaths: []
+ruleType: "file-trigger"
+ruleSettings:
+  fileTrigger: "Package.swift"
+  excludePaths:
+    - ".build"

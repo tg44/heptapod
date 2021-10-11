@@ -1,0 +1,10 @@
+name: "scala-sbt"
+enabled: true
+searchPaths: ["~"]
+ignorePaths: []
+ruleType: "file-trigger"
+ruleSettings:
+  fileTrigger: "build.sbt"
+  excludePaths:
+    - "target"
+    - "project/target"

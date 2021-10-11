@@ -1,0 +1,9 @@
+name: "node"
+enabled: true
+searchPaths: ["~/dev"]
+ignorePaths: ["~/dev/alpakka", "~/dev/akka"]
+ruleType: "file-trigger"
+ruleSettings:
+  fileTrigger: "package.json"
+  excludePaths:
+    - "node_modules"

@@ -1,0 +1,10 @@
+name: "scala"
+enabled: true
+searchPaths: ["~/dev"]
+ignorePaths: []
+ruleType: "file-trigger"
+ruleSettings:
+  fileTrigger: "build.sbt"
+  excludePaths:
+    - "target"
+    - "project/target"

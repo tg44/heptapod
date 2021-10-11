@@ -1,0 +1,9 @@
+name: "vagrant"
+enabled: true
+searchPaths: ["~"]
+ignorePaths: []
+ruleType: "file-trigger"
+ruleSettings:
+  fileTrigger: "Vagrantfile"
+  excludePaths:
+    - ".vagrant"

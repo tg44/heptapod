@@ -1,0 +1,9 @@
+name: "php"
+enabled: true
+searchPaths: ["~"]
+ignorePaths: []
+ruleType: "file-trigger"
+ruleSettings:
+  fileTrigger: "composer.json"
+  excludePaths:
+    - "vendor"

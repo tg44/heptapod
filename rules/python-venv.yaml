@@ -1,0 +1,10 @@
+name: "python-venv"
+enabled: true
+searchPaths: ["~"]
+ignorePaths: []
+ruleType: "file-trigger"
+ruleSettings:
+  fileTrigger: "requirements.txt"
+  excludePaths:
+    - ".venv"
+    - "venv"

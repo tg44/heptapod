@@ -1,0 +1,9 @@
+name: "ruby"
+enabled: true
+searchPaths: ["~"]
+ignorePaths: []
+ruleType: "file-trigger"
+ruleSettings:
+  fileTrigger: "Gemfile"
+  excludePaths:
+    - "vendor"

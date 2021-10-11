@@ -1,0 +1,9 @@
+name: "bower"
+enabled: true
+searchPaths: ["~"]
+ignorePaths: []
+ruleType: "file-trigger"
+ruleSettings:
+  fileTrigger: "bower.json"
+  excludePaths:
+    - "bower_components"

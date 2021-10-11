@@ -1,0 +1,9 @@
+name: "haskell"
+enabled: true
+searchPaths: ["~"]
+ignorePaths: []
+ruleType: "file-trigger"
+ruleSettings:
+  fileTrigger: "stack.yaml"
+  excludePaths:
+    - ".stack-work"

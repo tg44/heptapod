@@ -1,0 +1,9 @@
+name: "go"
+enabled: true
+searchPaths: ["~"]
+ignorePaths: []
+ruleType: "file-trigger"
+ruleSettings:
+  fileTrigger: "go.mod"
+  excludePaths:
+    - "vendor"

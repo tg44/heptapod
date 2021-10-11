@@ -1,0 +1,9 @@
+name: "python-tox"
+enabled: true
+searchPaths: ["~"]
+ignorePaths: []
+ruleType: "file-trigger"
+ruleSettings:
+  fileTrigger: "tox.ini"
+  excludePaths:
+    - ".tox"
