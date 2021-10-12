@@ -1,0 +1,75 @@
+# This is an example .goreleaser.yml file with some sensible defaults.
+# Make sure to check the documentation at https://goreleaser.com
+before:
+  hooks:
+    # You may remove this if you don't use go modules.
+    - go mod tidy
+    # you may remove this if you don't need go generate
+    - go generate ./...
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+archives:
+  - replacements:
+      darwin: Darwin
+      amd64: x86_64
+    files:
+      - LICENSE*
+      - README*
+      - CHANGELOG*
+      - rules/**
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+brews:
+  -
+    name: heptapod
+
+    # GOARM to specify which 32-bit arm version to use if there are multiple versions
+    # from the build section. Brew formulas support atm only one 32-bit version.
+    # Default is 6 for all artifacts or each id if there a multiple versions.
+    goarm: 6
+
+    # NOTE: make sure the url_template, the token and given repo (github or gitlab) owner and name are from the
+    # same kind. We will probably unify this in the next major version like it is done with scoop.
+
+    # GitHub/GitLab repository to push the formula to
+    tap:
+      owner: tg44
+      name: homebrew-heptapod
+      # Optionally a branch can be provided. If the branch does not exist, it
+      # will be created. If no branch is listed, the default branch will be used
+      branch: main
+      # Optionally a token can be provided, if it differs from the token provided to GoReleaser
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+
+    # Template for the url which is determined by the given Token (github or gitlab)
+    # Default for github is "https://github.com/<repo_owner>/<repo_name>/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    # Default for gitlab is "https://gitlab.com/<repo_owner>/<repo_name>/-/releases/{{ .Tag }}/downloads/{{ .ArtifactName }}"
+    # Default for gitea is "https://gitea.com/<repo_owner>/<repo_name>/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    url_template: "https://github.com/tg44/homebrew-heptapod/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+
+    commit_author:
+      name: goreleaserbot
+      email: goreleaser@carlosbecker.com
+    commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
+    caveats: "Start with `heptapod -h`!"
+    homepage: "https://github.com/tg44/heptapod"
+
+    description: "This is a command line application to manage and fine-tune Time Machine exclude paths."
+
+    # SPDX identifier of your app's license.
+    # Default is empty.
+    license: "MIT"
+
+    install: |
+      bin.install "heptapod"

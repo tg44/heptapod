@@ -36,7 +36,7 @@ func main() {
 			&cli.StringFlag{
 				Name:        "rules",
 				Aliases:     []string{"r"},
-				Value:       "./rules",
+				Value:       "~/.heptapod/rules",
 				Usage:       "the directory containing rule yamls",
 				Destination: &rulePath,
 			},

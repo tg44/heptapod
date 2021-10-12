@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"github.com/tg44/heptapod/pkg/utils"
 	"github.com/tg44/heptapod/pkg/walker"
 	"io/ioutil"
 	"log"
@@ -27,7 +28,11 @@ type RuleGroups struct {
 	Disabled   map[string]Rule
 }
 
-func ParseRulesFromDir(path string) (*RuleGroups, error) {
+func ParseRulesFromDir(pathIn string) (*RuleGroups, error) {
+	path, err := utils.FixupPathsToHandleHome(pathIn)
+	if err != nil {
+		return nil, err
+	}
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		return nil, err
