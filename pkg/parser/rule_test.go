@@ -16,7 +16,7 @@ func TestRuleParse(t *testing.T) {
 	if res.Name != "git" {
 		t.Errorf("Rule parser name parse error!")
 	}
-	if res.Enabled != true {
+	if res.Enabled != false {
 		t.Errorf("Rule parser enabled parse error!")
 	}
 	if len(res.SearchPaths) != 1 || res.SearchPaths[0] != "~" {

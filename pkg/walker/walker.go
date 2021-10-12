@@ -15,19 +15,18 @@ import (
 type Walker = func(path string, files []os.FileInfo) ([]string, []string, []string)
 
 type WalkerIgnores struct {
-	w Walker
+	w            Walker
 	localIgnores []string
 }
 
 type WalkJob struct {
-	Rootpath string
-	Walkers []Walker
+	Rootpath        string
+	Walkers         []Walker
 	AlreadyFiltered []string
 }
 
-
-func Run(jobs []WalkJob, par int, bufferSize int) []string {
-	defer utils.TimeTrack(time.Now(), "walker run")
+func Run(jobs []WalkJob, par int, bufferSize int, verbose bool) []string {
+	defer utils.TimeTrack(time.Now(), "walker run", verbose)
 	if len(jobs) == 0 {
 		return []string{}
 	}
@@ -40,16 +39,16 @@ func Run(jobs []WalkJob, par int, bufferSize int) []string {
 	}
 
 	for w := 1; w <= par; w++ {
-		go worker(w, spawn, start, end)
+		go worker(w, spawn, start, end, verbose)
 	}
 
 	res := []string{}
 	//wait loop
-	<- start
+	<-start
 	for e := range end {
 		more := false
 		select {
-		case <- start:
+		case <-start:
 			more = true
 		default:
 			more = false
@@ -64,15 +63,14 @@ func Run(jobs []WalkJob, par int, bufferSize int) []string {
 	return res
 }
 
-func worker(id int, spawn chan WalkJob, start chan bool, end chan []string) {
+func worker(id int, spawn chan WalkJob, start chan bool, end chan []string, verbose bool) {
 	for j := range spawn {
-		walk(id, j.Rootpath, j.Walkers, j.AlreadyFiltered, spawn, start, end)
+		walk(id, j.Rootpath, j.Walkers, j.AlreadyFiltered, spawn, start, end, verbose)
 	}
 }
 
-
-func walk(runnerId int, rootpath string, walkers []Walker, alreadyFiltered []string, spawn chan WalkJob, start chan bool, end chan []string) {
-	defer utils.TimeTrack(time.Now(), fmt.Sprintf("(runner-%d) walk on %s", runnerId, rootpath))
+func walk(runnerId int, rootpath string, walkers []Walker, alreadyFiltered []string, spawn chan WalkJob, start chan bool, end chan []string, verbose bool) {
+	defer utils.TimeTrack(time.Now(), fmt.Sprintf("(runner-%d) walk on %s", runnerId, rootpath), verbose)
 	start <- true
 	hasNext := true
 	var res *utils.List = nil
@@ -101,7 +99,6 @@ func walk(runnerId int, rootpath string, walkers []Walker, alreadyFiltered []str
 			ignores = append(ignores, WalkerIgnores{walker, i2})
 			globalIgnores = append(globalIgnores, i1...)
 		}
-
 
 		for _, file := range files {
 			if file.IsDir() {

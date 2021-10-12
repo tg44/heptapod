@@ -5,7 +5,9 @@ import (
 	"time"
 )
 
-func TimeTrack(start time.Time, name string) {
+func TimeTrack(start time.Time, name string, verbose bool) {
 	elapsed := time.Since(start)
-	log.Printf("%s took %s", name, elapsed)
+	if verbose {
+		log.Printf("%s took %s", name, elapsed)
+	}
 }
