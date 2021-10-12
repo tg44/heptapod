@@ -1,5 +1,5 @@
 name: "git"
-enabled: true
+enabled: false
 searchPaths: ["~"]
 ignorePaths: []
 ruleType: "file-trigger"

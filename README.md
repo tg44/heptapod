@@ -10,15 +10,18 @@ done:
  - architecture the protocol/configs
  - most of asimovs features are ported
  - example rules added
-
-todos:
  - command line interface
  - option to dryrun, show inner states, write to file
+ - purge option
+   - we should write down what paths excluded by us, and include them back
+
+todos:
  - handle global deps (m2, ivy, nvm, npm) 
  - support tmignore functionality
  - support tmignore like funcionality with dockerignore
  - regexp pattern
  - brew package
+ - ghactions
  - hook to rerun periodically/before tmbackups
  - port asimov's issues (spotify, spotlight)
  - docker support (at least tell if docker vm is persisted or not)
@@ -28,8 +31,6 @@ todos:
  - preemptive search that tells you how many files with which size will be excluded/included
    - nice to have, we can tell the sizes, but counting files need to actually count the files which could be slow AH 
  - speedtest it
- - purge option
-   - we should write down what paths excluded by us, and include them back
  - modify the backup intervals and frequencies
    - not sure it can be done with tmutil, but there are applications for this 
  - probably adding `.` and `..` will break the execution shortcuts and need to fix them
