@@ -41,8 +41,8 @@ func AddPathsToTM(paths []string, logDir string, bufferSize int, verbose bool) {
 
 	go func() {
 		for j := range check {
-			res, _ := checkPath(j)
-			if res {
+			res, err := checkPath(j, verbose)
+			if res && err == nil {
 				add <- j
 			}
 		}
@@ -51,8 +51,10 @@ func AddPathsToTM(paths []string, logDir string, bufferSize int, verbose bool) {
 
 	go func() {
 		for j := range add {
-			addPath(j, logFile)
-			added += 1
+			err = addPath(j, logFile)
+			if err == nil {
+				added += 1
+			}
 		}
 		finished <- true
 		close(finished)
@@ -68,7 +70,7 @@ func AddPathsToTM(paths []string, logDir string, bufferSize int, verbose bool) {
 	}
 }
 
-func checkPath(path string) (bool, error) {
+func checkPath(path string, verbose bool) (bool, error) {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return false, err
 	}
@@ -76,8 +78,14 @@ func checkPath(path string) (bool, error) {
 
 	var out bytes.Buffer
 	cmd.Stdout = &out
+	var outErr bytes.Buffer
+	cmd.Stderr = &outErr
 	err := cmd.Run()
 	if err != nil {
+		if verbose {
+			log.Println(out.String())
+			log.Println(outErr.String())
+		}
 		return false, err
 	}
 
@@ -85,16 +93,23 @@ func checkPath(path string) (bool, error) {
 	return !strings.Contains(s, "[Excluded]"), nil
 }
 
-func addPath(path string, logfile *os.File) {
+func addPath(path string, logfile *os.File) error {
 	cmd := exec.Command("tmutil", "addexclusion", path)
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	var outErr bytes.Buffer
+	cmd.Stderr = &outErr
 	err := cmd.Run()
 	if err != nil {
-		log.Fatal(err)
+		log.Println(out.String())
+		log.Println(outErr.String())
+		return err
 	}
 	_, _ = logfile.WriteString(path + "\r\n")
+	return nil
 }
 
-func removePath(path string) {
+func removePath(path string) error {
 	cmd := exec.Command("tmutil", "removeexclusion", path)
 	var out bytes.Buffer
 	cmd.Stdout = &out
@@ -104,8 +119,8 @@ func removePath(path string) {
 	if err != nil {
 		log.Println(out.String())
 		log.Println(outErr.String())
-		log.Fatal(err)
 	}
+	return err
 }
 
 func RemoveAllFromLogs(logPath string, bufferSize int, verbose bool) {
@@ -145,7 +160,7 @@ func RemovePathsFromTM(paths []string, bufferSize int, verbose bool) {
 
 	go func() {
 		for j := range check {
-			res, err := checkPath(j)
+			res, err := checkPath(j, verbose)
 			if !res && err == nil {
 				remove <- j
 			}
@@ -155,8 +170,10 @@ func RemovePathsFromTM(paths []string, bufferSize int, verbose bool) {
 
 	go func() {
 		for j := range remove {
-			removePath(j)
-			removed += 1
+			err := removePath(j)
+			if err == nil {
+				removed += 1
+			}
 		}
 		finished <- true
 		close(finished)
