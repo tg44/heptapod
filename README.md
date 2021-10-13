@@ -30,7 +30,7 @@ Will print help!
 
 ```
 mkdir -p ~/.heptapod/rules
-cp -R $(brew --prefix heptapod)/rules ~/.heptapod/rules
+cp -R $(brew --prefix heptapod)/rules ~/.heptapod
 ```
 This will move the currently added ruleset to `~/.heptapod/rules`
 

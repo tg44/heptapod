@@ -84,9 +84,9 @@ func main() {
 				},
 				Action: func(c *cli.Context) error {
 					if verbose {
-						fmt.Println(version)
-						fmt.Println(commit)
-						fmt.Println(date)
+						fmt.Println("version: ", version)
+						fmt.Println("commit: ", commit)
+						fmt.Println("date: ", date)
 					} else {
 						fmt.Println(version)
 					}
@@ -126,7 +126,8 @@ func main() {
 				Action: func(c *cli.Context) error {
 					if dry {
 						res := pkg.GetExcludedPaths(rulePath, par, buffer, verbose)
-						println(res)
+						fmt.Print(strings.Join(res,"\r\n"))
+						fmt.Print("\n")
 					} else {
 						res := pkg.GetExcludedPaths(rulePath, par, buffer, verbose)
 						tmutil.AddPathsToTM(res, logDir, buffer, verbose)
@@ -144,7 +145,7 @@ func main() {
 				Flags:   []cli.Flag{},
 				Action: func(c *cli.Context) error {
 					res := tmutil.GetExcludeList()
-					println(res)
+					fmt.Println(res)
 					return nil
 				},
 			},
@@ -206,18 +207,18 @@ func ruleTable(path string, all bool) error {
 	if err != nil {
 		return err
 	}
-	println("Enabled rules:")
+	fmt.Println("Enabled rules:")
 	writeRules(list.Enabled)
 	if all {
-		println("Disabled rules:")
+		fmt.Println("Disabled rules:")
 		writeRules(list.Disabled)
 	}
 	if all {
-		println("Errors:")
+		fmt.Println("Errors:")
 		writeErrorRules(list.FileErrors)
 	}
 	if all {
-		println("Type parse errors:")
+		fmt.Println("Type parse errors:")
 		writeTypeErrorRules(list.TypeErrors)
 	}
 	return nil
