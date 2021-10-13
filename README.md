@@ -29,9 +29,10 @@ heptapod <action> -h
 Will print help!
 
 ```
-heptapod initRules
+mkdir -p ~/.heptapod/rules
+cp -R $(brew --prefix heptapod)/rules ~/.heptapod/rules
 ```
-This will move the currently added ruleset to `~/.heptapod/rules` (or the set `--rules dir` directory) they are added as enabled rules!
+This will move the currently added ruleset to `~/.heptapod/rules`
 
 ```
 heptapod ls -a

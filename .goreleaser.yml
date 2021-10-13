@@ -73,4 +73,4 @@ brews:
 
     install: |
       bin.install "heptapod"
-      bin.install Dir["rules/*"]
+      prefix.install Dir["rules"]

@@ -6,13 +6,9 @@ import (
 	"github.com/tg44/heptapod/pkg"
 	"github.com/tg44/heptapod/pkg/parser"
 	"github.com/tg44/heptapod/pkg/tmutil"
-	"github.com/tg44/heptapod/pkg/utils"
 	"github.com/urfave/cli/v2"
-	"io"
-	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
 	"sort"
 	"strings"
 )
@@ -190,50 +186,6 @@ func main() {
 					} else {
 						log.Fatal("one of the options is mandatory, please add current, all, or a file")
 					}
-					return nil
-				},
-			},
-			{
-				Name:    "initRules",
-				Aliases: []string{},
-				Usage:   "copy the example rules to the given rule dir",
-				Flags:   []cli.Flag{},
-				Action: func(c *cli.Context) error {
-					dest, err := utils.FixupPathsToHandleHome(rulePath)
-					if err != nil {
-						return err
-					}
-					srcDir := "./rules"
-					entries, err := ioutil.ReadDir(srcDir)
-					if err != nil {
-						return err
-					}
-					for _, entry := range entries {
-						sourcePath := filepath.Join(srcDir, entry.Name())
-						destPath := filepath.Join(dest, entry.Name())
-
-						out, err := os.Create(destPath)
-						if err != nil {
-							return err
-						}
-						defer func() {
-							_ = out.Close()
-						}()
-
-						in, err := os.Open(sourcePath)
-						if err != nil {
-							return err
-						}
-						defer func() {
-							_ = in.Close()
-						}()
-
-						_, err = io.Copy(out, in)
-						if err != nil {
-							return err
-						}
-					}
-					fmt.Printf("All the rules are copied to %s, please check them with heptapod ls -a, and optionally edit them for better include/exclude rules!\n", rulePath)
 					return nil
 				},
 			},
