@@ -5,7 +5,7 @@ import (
 )
 
 func TestRuleParse(t *testing.T) {
-	res, err := ruleParse("../test-rules/git.yaml")
+	res, err := ruleParse("../../test-rules/git.yaml")
 	//t.Log(res)
 	if err != nil {
 		t.Errorf("Rule parser can't parse testRule!")

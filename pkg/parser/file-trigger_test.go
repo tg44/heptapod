@@ -3,7 +3,7 @@ package parser
 import "testing"
 
 func TestFileTriggerSettingsParse(t *testing.T) {
-	rule, err := ruleParse("../test-rules/git.yaml")
+	rule, err := ruleParse("../../test-rules/git.yaml")
 	if err != nil {
 		t.Errorf("Rule parser can't parse testRule!")
 	}

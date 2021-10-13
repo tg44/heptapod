@@ -1,24 +1,27 @@
 package main
 
 import (
+	"fmt"
 	"github.com/olekukonko/tablewriter"
 	"github.com/tg44/heptapod/pkg"
 	"github.com/tg44/heptapod/pkg/parser"
 	"github.com/tg44/heptapod/pkg/tmutil"
+	"github.com/tg44/heptapod/pkg/utils"
 	"github.com/urfave/cli/v2"
+	"io"
+	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 )
 
+var version string = "local-build"
+var commit string = ""
+var date string = ""
+
 func main() {
-	//res := pkg.GetExcludedPaths([]string{"test-rules/scala.yaml", "test-rules/node.yaml"}, 4, 2048)
-	//tmutil.AddPathsToTM(res, 2048)
-	//fmt.Println(len(res))
-
-	//fmt.Println(tmutil.GetExcludeList())
-
 	var rulePath string
 	var logDir string
 	var file string
@@ -43,7 +46,7 @@ func main() {
 			&cli.StringFlag{
 				Name:        "logDir",
 				Aliases:     []string{"ld"},
-				Value:       "./.logs",
+				Value:       "~/.heptapod/logs",
 				Usage:       "the directory where excluded dirs logged for reliable prune/uninstall",
 				Destination: &logDir,
 			},
@@ -70,6 +73,30 @@ func main() {
 			},
 		},
 		Commands: []*cli.Command{
+			{
+				Name:    "version",
+				Aliases: []string{"v"},
+				Usage:   "version info",
+				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name:        "verbose",
+						Aliases:     []string{"v"},
+						Value:       false,
+						Usage:       "more detaild version info",
+						Destination: &verbose,
+					},
+				},
+				Action: func(c *cli.Context) error {
+					if verbose {
+						fmt.Println(version)
+						fmt.Println(commit)
+						fmt.Println(date)
+					} else {
+						fmt.Println(version)
+					}
+					return nil
+				},
+			},
 			{
 				Name:    "list",
 				Aliases: []string{"ls"},
@@ -108,7 +135,7 @@ func main() {
 						res := pkg.GetExcludedPaths(rulePath, par, buffer, verbose)
 						tmutil.AddPathsToTM(res, logDir, buffer, verbose)
 						if verbose {
-							log.Printf("total %d paths found", len(res))
+							log.Printf("total %d paths found\n", len(res))
 						}
 					}
 					return nil
@@ -163,6 +190,50 @@ func main() {
 					} else {
 						log.Fatal("one of the options is mandatory, please add current, all, or a file")
 					}
+					return nil
+				},
+			},
+			{
+				Name:    "initRules",
+				Aliases: []string{},
+				Usage:   "copy the example rules to the given rule dir",
+				Flags:   []cli.Flag{},
+				Action: func(c *cli.Context) error {
+					dest, err := utils.FixupPathsToHandleHome(rulePath)
+					if err != nil {
+						return err
+					}
+					srcDir := "./rules"
+					entries, err := ioutil.ReadDir(srcDir)
+					if err != nil {
+						return err
+					}
+					for _, entry := range entries {
+						sourcePath := filepath.Join(srcDir, entry.Name())
+						destPath := filepath.Join(dest, entry.Name())
+
+						out, err := os.Create(destPath)
+						if err != nil {
+							return err
+						}
+						defer func() {
+							_ = out.Close()
+						}()
+
+						in, err := os.Open(sourcePath)
+						if err != nil {
+							return err
+						}
+						defer func() {
+							_ = in.Close()
+						}()
+
+						_, err = io.Copy(out, in)
+						if err != nil {
+							return err
+						}
+					}
+					fmt.Printf("All the rules are copied to %s, please check them with heptapod ls -a, and optionally edit them for better include/exclude rules!\n", rulePath)
 					return nil
 				},
 			},

@@ -3,41 +3,68 @@
 This is a command line application to manage and fine-tune
 [Time Machine](https://support.apple.com/en-us/HT201250) exclude paths.
 
-## This repository is a WIP! The advertised functionality is nonexistent yet :(
+<details>
+  <summary>Why it is named after creatures from Arrival?</summary>
+Heptapods are extraterrestrial species from the movie Arrival.
+They are special because they have non-linear time perspective.
+Their written language (Heptapod B) is basically describes 
+the future and the past in the same time. Hence the name of the tool.
+</details>
 
-### Repo state
-done:
- - architecture the protocol/configs
- - most of asimovs features are ported
- - example rules added
- - command line interface
- - option to dryrun, show inner states, write to file
- - purge option
-   - we should write down what paths excluded by us, and include them back
+### Install
 
-todos:
- - handle global deps (m2, ivy, nvm, npm) 
- - support tmignore functionality
- - support tmignore like funcionality with dockerignore
- - regexp pattern
- - brew package
- - ghactions
- - hook to rerun periodically/before tmbackups
- - port asimov's issues (spotify, spotlight)
- - docker support (at least tell if docker vm is persisted or not)
-   - this is kinda easy with tmutil.GetExcludeList() 
- - android vms?
-   - this should be also easy
- - preemptive search that tells you how many files with which size will be excluded/included
-   - nice to have, we can tell the sizes, but counting files need to actually count the files which could be slow AH 
- - speedtest it
- - modify the backup intervals and frequencies
-   - not sure it can be done with tmutil, but there are applications for this 
- - probably adding `.` and `..` will break the execution shortcuts and need to fix them
- - wildcards like `*.sh` not working right now, do we want to make them work?
+```sh
+brew tap tg44/heptapod
+```
+```sh
+brew install heptapod
+```
 
-### Notes for migrating to a new machine
-`xcode-select --install` may be needed after a migration
+### Usage
+
+```
+heptapod -h
+heptapod <action> -h
+```
+Will print help!
+
+```
+heptapod initRules
+```
+This will move the currently added ruleset to `~/.heptapod/rules` (or the set `--rules dir` directory) they are added as enabled rules!
+
+```
+heptapod ls -a
+```
+Lists all the rules (you get 4 tables, enabled, disabled, parseable but unrunable and unparsable).
+
+```
+heptapod lse
+```
+Could list all the currently excluded TM paths.
+
+```
+heptapod -v run -d
+```
+Will dryrun the current rules, will log speed informations. (Potentially list nonexistent directories and files!)
+
+```
+heptapod run
+```
+Will run the current rules, and add them to the TM exclude list. Also writes exclude logs to `~/.heptapod/logs` (or the given `--logDir dir`) for easier revert.
+
+```
+heptapod prune -a
+```
+Will revert all the previously added paths from the run-exclude-logs. (`prune -h` could tell you the other useful revert options).
+
+
+
+
+### Notes for TM migrating to a new machine
+When you try to migrate your TM state to a new machine
+`xcode-select --install` may be needed. Somehow this is 
+sometimes not migrating as you thought it will.
 
 ### Rules
 Every rule has a searchPaths, ignorePaths.
@@ -73,3 +100,38 @@ Ignores files/dirs based on other files existence, made for easy language dep ig
  - [tmignore](https://github.com/samuelmeuli/tmignore)
  - [various stack exchange responses](https://superuser.com/questions/1161038/exclude-folders-by-regex-from-time-machine-backup)
  - [tmutil](https://ss64.com/osx/tmutil.html)
+
+### Contribution
+If you are interested in this repo, star it, and write an issue, and we can talk about future ideas there!
+
+
+### Repo/developement state
+done:
+- architecture the protocol/configs
+- most of asimov's features are ported
+- example rules added
+- command line interface
+- option to dryrun, show inner states, write to file
+- purge option
+   - we should write down what paths excluded by us, and include them back
+- brew package
+- ghactions
+
+todos:
+- handle global deps (m2, ivy, nvm, npm)
+- support tmignore functionality
+- support tmignore like funcionality with dockerignore
+- regexp pattern
+- hook to rerun periodically/before tmbackups
+- port asimov's issues (spotify, spotlight)
+- docker support (at least tell if docker vm is persisted or not)
+   - this is kinda easy with tmutil.GetExcludeList()
+- android vms?
+   - this should be also easy
+- preemptive search that tells you how many files with which size will be excluded/included
+   - nice to have, we can tell the sizes, but counting files need to actually count the files which could be slow AH
+- speedtest it
+- modify the backup intervals and frequencies
+   - not sure it can be done with tmutil, but there are applications for this
+- probably adding `.` and `..` will break the execution shortcuts and need to fix them
+- wildcards like `*.sh` not working right now, do we want to make them work?

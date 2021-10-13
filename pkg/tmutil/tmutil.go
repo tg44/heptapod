@@ -13,8 +13,12 @@ import (
 	"time"
 )
 
-func AddPathsToTM(paths []string, logPath string, bufferSize int, verbose bool) {
-	err := os.MkdirAll(logPath, os.ModePerm)
+func AddPathsToTM(paths []string, logDir string, bufferSize int, verbose bool) {
+	logPath, err := utils.FixupPathsToHandleHome(logDir)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = os.MkdirAll(logPath, os.ModePerm)
 	if err != nil {
 		log.Fatal(err)
 	}
