@@ -126,6 +126,7 @@ func main() {
 				Action: func(c *cli.Context) error {
 					if dry {
 						res := pkg.GetExcludedPaths(rulePath, par, buffer, verbose)
+						fmt.Println("-----")
 						fmt.Print(strings.Join(res,"\r\n"))
 						fmt.Print("\n")
 					} else {

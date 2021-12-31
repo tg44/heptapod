@@ -12,7 +12,8 @@ import (
 //first ret is the excluding paths we found
 //second ret is the global ignore paths if we don't want other runners to go into it
 //third ret is the local ignore path if we don't want to go into it next time
-type Walker = func(path string, files []os.FileInfo) ([]string, []string, []string)
+//last param is the name of the rule for verbose
+type Walker = func(path string, files []os.FileInfo) ([]string, []string, []string, string)
 
 type WalkerIgnores struct {
 	w            Walker
@@ -94,7 +95,23 @@ func walk(runnerId int, rootpath string, walkers []Walker, alreadyFiltered []str
 		ignores := []WalkerIgnores{}
 		globalIgnores := []string{}
 		for _, walker := range walkers {
-			r, i1, i2 := walker(l.Data, files)
+			r, i1, i2, name := walker(l.Data, files)
+			if(verbose && len(r) > 0) {
+				fmt.Println("-----")
+				fmt.Println(name)
+				fmt.Println(l.Data)
+				for _, v := range r {
+					fmt.Println("\t", v)
+				}
+				fmt.Println("-")
+				for _, v := range i1 {
+					fmt.Println("\t", v)
+				}
+				fmt.Println("-")
+				for _, v := range i2 {
+					fmt.Println("\t", v)
+				}
+			}
 			res = res.Prepend(r)
 			ignores = append(ignores, WalkerIgnores{walker, i2})
 			globalIgnores = append(globalIgnores, i1...)
