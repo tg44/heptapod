@@ -84,6 +84,9 @@ func walk(runnerId int, rootpath string, walkers []Walker, alreadyFiltered []str
 		next := l.Next
 		files, err := ioutil.ReadDir(l.Data)
 		if err != nil {
+			if (verbose) {
+				fmt.Println("!!! There was an error reading ", l.Data, " - ", err.Error())
+			}
 			if next == nil {
 				hasNext = false
 			} else {
@@ -131,10 +134,10 @@ func walk(runnerId int, rootpath string, walkers []Walker, alreadyFiltered []str
 							}
 							if len(keeps) == len(walkers) {
 								//if no ignore happened we go further with this runner
-								next = next.AddAsHead(filepath.Join(l.Data, file.Name()))
+								next = next.AddAsHead(f)
 							} else {
 								//if some ignore happened we ignore the path, and spawn a new job with the nonignorant walkers
-								spawn <- WalkJob{filepath.Join(l.Data, file.Name()), keeps, alreadyFiltered}
+								spawn <- WalkJob{f, keeps, alreadyFiltered}
 							}
 						}
 					}

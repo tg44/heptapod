@@ -78,6 +78,10 @@ func parse(ruleFile string) []walker.WalkJob {
 		log.Println(err)
 		return []walker.WalkJob{}
 	}
+	if(rule == nil) {
+		log.Println(ruleFile, " has a strange error, we didn't get parse error, but it is not parsed either... Please report the content of the file to https://github.com/tg44/heptapod/issues/5")
+		return []walker.WalkJob{}
+	}
 	if !rule.Enabled {
 		return []walker.WalkJob{}
 	}
