@@ -78,6 +78,11 @@ func walk(runnerId int, rootpath string, walkers []Walker, alreadyFiltered []str
 	path, err := utils.FixupPathsToHandleHome(rootpath)
 	if err != nil {
 		end <- []string{}
+		return
+	}
+	if len(walkers) == 0 {
+		end <- []string{}
+		return
 	}
 	l := &utils.List{path, nil}
 	for hasNext {
@@ -85,14 +90,14 @@ func walk(runnerId int, rootpath string, walkers []Walker, alreadyFiltered []str
 		files, err := ioutil.ReadDir(l.Data)
 		if err != nil {
 			if (verbose) {
-				fmt.Println("!!! There was an error reading ", l.Data, " - ", err.Error())
+				fmt.Println("!!! There was an error: ", err.Error())
 			}
 			if next == nil {
 				hasNext = false
 			} else {
 				l = next
 			}
-			break
+			continue
 		}
 
 		ignores := []WalkerIgnores{}

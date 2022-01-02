@@ -22,45 +22,50 @@ brew install heptapod
 
 ### Usage
 
+To print help;
 ```
 heptapod -h
 heptapod <action> -h
 ```
-Will print help!
 
+Move (and use) the default ruleset;
 ```
 mkdir -p ~/.heptapod/rules
 cp -R $(brew --prefix heptapod)/rules ~/.heptapod
 ```
-This will move the currently added ruleset to `~/.heptapod/rules`
 
-```
-heptapod ls -a
-```
 Lists all the rules (you get 4 tables, enabled, disabled, parseable but unrunable and unparsable).
-
 ```
-heptapod lse
+heptapod rules ls -a
 ```
-Could list all the currently excluded TM paths.
 
+Enable/disable rules (by name), or add/remove ignore folders;
+```
+heptapod rules disable node bower
+heptapod rules enable bower
+heptapod rules ignoreAdd ~/.Trash ~/.yarn/cache ~/Library
+heptapod rules ignoreRemove ~/.Trash
+```
+
+List all the currently excluded TM paths;
+```
+heptapod tm ls
+```
+
+Dryrun the current rules, in verbose mode, also log speed and debug informations. (Potentially list nonexistent directories and files!)
 ```
 heptapod -v run -d
 ```
-Will dryrun the current rules, will log speed informations. (Potentially list nonexistent directories and files!)
 
+To run the current rules, and add the dirs to the TM exclude list. Also writes exclude logs to `~/.heptapod/logs` (or the given `--logDir dir`) for easier revert.
 ```
 heptapod run
 ```
-Will run the current rules, and add them to the TM exclude list. Also writes exclude logs to `~/.heptapod/logs` (or the given `--logDir dir`) for easier revert.
 
+To revert all the previously added paths from the run-exclude-logs. (`prune -h` could tell you the other useful revert options).
 ```
 heptapod prune -a
 ```
-Will revert all the previously added paths from the run-exclude-logs. (`prune -h` could tell you the other useful revert options).
-
-
-
 
 ### Notes for TM migrating to a new machine
 When you try to migrate your TM state to a new machine
@@ -117,6 +122,7 @@ done:
    - we should write down what paths excluded by us, and include them back
 - brew package
 - ghactions
+- rule manage commands (list/enable/disable/ignoreAdd/ignoreRemove)
 
 todos:
 - handle global deps (m2, ivy, nvm, npm)

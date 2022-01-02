@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"github.com/tg44/heptapod/pkg/utils"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 )
@@ -14,7 +15,7 @@ type Rule struct {
 	RuleSettings map[string]interface{} `yaml:"ruleSettings"`
 }
 
-func ruleParse(fileName string) (*Rule, error) {
+func RuleParse(fileName string) (*Rule, error) {
 	yfile, err := ioutil.ReadFile(fileName)
 
 	if err != nil {
@@ -30,4 +31,19 @@ func ruleParse(fileName string) (*Rule, error) {
 	}
 
 	return &rule, nil
+}
+
+func RuleWrite(rule Rule, file string) error {
+
+	rule.IgnorePaths = utils.Unique(rule.IgnorePaths)
+	data, err := yaml.Marshal(&rule)
+	if err != nil {
+		return err
+	}
+
+	err2 := ioutil.WriteFile(file, data, 0)
+	if err2 != nil {
+		return err2
+	}
+	return nil
 }

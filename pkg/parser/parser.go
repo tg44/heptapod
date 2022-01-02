@@ -44,7 +44,7 @@ func ParseRulesFromDir(pathIn string) (*RuleGroups, error) {
 	for _, file := range files {
 		if strings.HasSuffix(file.Name(), ".yml") || strings.HasSuffix(file.Name(), ".yaml") {
 			fp := filepath.Join(path, file.Name())
-			rule, err := ruleParse(fp)
+			rule, err := RuleParse(fp)
 			if err != nil {
 				errors = append(errors, file.Name())
 				continue
@@ -73,7 +73,7 @@ func Parse(ruleFiles []string) []walker.WalkJob {
 }
 
 func parse(ruleFile string) []walker.WalkJob {
-	rule, err := ruleParse(ruleFile)
+	rule, err := RuleParse(ruleFile)
 	if err != nil {
 		log.Println(err)
 		return []walker.WalkJob{}
