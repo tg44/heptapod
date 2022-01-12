@@ -13,25 +13,38 @@ var all bool
 var current bool
 
 var TmCommands = &cli.Command{
-	Name: "timeMachine",
+	Name:    "timeMachine",
 	Aliases: []string{"tm"},
 	Usage:   "timeMachine related functions",
 	Subcommands: []*cli.Command{
 		TmListExcluded,
+		TmListExcludedAll,
 		TmPrune,
 	},
 }
 
 var TmListExcluded = &cli.Command{
-Name:    "excluded",
-Aliases: []string{"ls"},
-Usage:   "lists all the excluded dirs from tmutil",
-Flags:   []cli.Flag{},
-Action: func(c *cli.Context) error {
-	res := tmutil.GetExcludeList()
-	fmt.Println(res)
-	return nil
-},
+	Name:    "excluded",
+	Aliases: []string{"ls", "list"},
+	Usage:   "lists the excluded dirs from tmutil (not full, uses cache)",
+	Flags:   []cli.Flag{},
+	Action: func(c *cli.Context) error {
+		res := tmutil.GetExcludeList()
+		fmt.Println(res)
+		return nil
+	},
+}
+
+var TmListExcludedAll = &cli.Command{
+	Name:    "excludedAll",
+	Aliases: []string{},
+	Usage:   "lists all the excluded dirs (not possible ATM)",
+	Flags:   []cli.Flag{},
+	Action: func(c *cli.Context) error {
+		res := tmutil.GetExcludeListAll()
+		fmt.Println(res)
+		return nil
+	},
 }
 
 var TmPrune = &cli.Command{

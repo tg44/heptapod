@@ -202,3 +202,11 @@ func GetExcludeList() string {
 
 	return out.String()
 }
+
+func GetExcludeListAll() string {
+	return "We can't list all of the excluded folders :(\nThe reason is mainly because there are two modes to get a file/folder excluded by TM;\n\n" +
+		" - we add a path as-is, 'hardcode' it as you wish, these can be read by `defaults read /Library/Preferences/com.apple.TimeMachine.plist SkipPaths` and these are the ones appear in the TM settings window\n\n" +
+		" - we can 'flag' files/folders, and if you move them they will be still flagged, but these are not in any list, so you either traverse every folder and check if it is excluded or not, or you use a cache like mdfind which is not a full cache (some files are excluded from it)\n\n" +
+		"So we can either add files by `tmutil addexclusion` and we can't list them all anymore, or we use `tmutil addexclusion -p` which will flood the settings, and more easy to break and also needs sudo. I chose the first option, so we can't reliably list all the excluded folders ATM.\n\n" +
+		"If you have any idea, or know a way to do this, contributions (or at least a new issue) welcomed at https://github.com/tg44/heptapod"
+}

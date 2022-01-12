@@ -67,10 +67,23 @@ To revert all the previously added paths from the run-exclude-logs. (`prune -h` 
 heptapod prune -a
 ```
 
-### Notes for TM migrating to a new machine
+### Notes from TM migrating to a new machine
 When you try to migrate your TM state to a new machine
 `xcode-select --install` may be needed. Somehow this is 
 sometimes not migrating as you thought it will.
+
+### Notes from TM in general
+There are two ways to exclude a dir from backups;
+- exclude by path (`tmutil addexclusion -p`)
+  - needs sudo
+  - can be read back with `defaults read /Library/Preferences/com.apple.TimeMachine.plist SkipPaths`
+  - appears in TM preferences / options
+- exclude by flag (`tmutil addexclusion`)
+  - keeps the given flag when moved
+  - can not be reliably list them (`mdfind com_apple_backup_excludeItem = 'com.apple.backupd'` is a close call, but some folders are excluded by mdfind too)
+
+This tool excludes by flag! You can check any folder manually with `tmutil isexcluded`. If you delete a folder, it will be deleted with its flag. You don't need to clean up ever.
+Also, you can only exclude nonexcluded files with tmutil, so we only add them if they are exists and if they are not already added.
 
 ### Rules
 Every rule has a searchPaths, ignorePaths.
