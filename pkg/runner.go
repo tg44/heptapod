@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-func GetExcludedPaths(ruleDir string, par int, bufferSize int, verbose bool) []string {
+func GetExcludedPaths(ruleDir string, par int, bufferSize int, verbose int) []string {
 	path, err := utils.FixupPathsToHandleHome(ruleDir)
 	if err != nil {
 		log.Fatal(err)

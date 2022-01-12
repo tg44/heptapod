@@ -10,17 +10,8 @@ func VersionCommand(version string, commit string, date string) *cli.Command {
 		Name:    "version",
 		Aliases: []string{"v"},
 		Usage:   "version info",
-		Flags: []cli.Flag{
-			&cli.BoolFlag{
-				Name:        "verbose",
-				Aliases:     []string{"v"},
-				Value:       false,
-				Usage:       "more detaild version info",
-				Destination: &verbose,
-			},
-		},
 		Action: func(c *cli.Context) error {
-			if verbose {
+			if verbose > 0 {
 				fmt.Println("version: ", version)
 				fmt.Println("commit: ", commit)
 				fmt.Println("date: ", date)

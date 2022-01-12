@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func AddPathsToTM(paths []string, logDir string, bufferSize int, verbose bool) {
+func AddPathsToTM(paths []string, logDir string, bufferSize int, verbose int) int {
 	logPath, err := utils.FixupPathsToHandleHome(logDir)
 	if err != nil {
 		log.Fatal(err)
@@ -65,12 +65,13 @@ func AddPathsToTM(paths []string, logDir string, bufferSize int, verbose bool) {
 	}
 	close(check)
 	<-finished
-	if verbose {
+	if verbose > 0 {
 		log.Printf("added %d", added)
 	}
+	return added
 }
 
-func checkPath(path string, verbose bool) (bool, error) {
+func checkPath(path string, verbose int) (bool, error) {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return false, err
 	}
@@ -82,7 +83,7 @@ func checkPath(path string, verbose bool) (bool, error) {
 	cmd.Stderr = &outErr
 	err := cmd.Run()
 	if err != nil {
-		if verbose {
+		if verbose > 1 {
 			log.Println(out.String())
 			log.Println(outErr.String())
 		}
@@ -123,7 +124,7 @@ func removePath(path string) error {
 	return err
 }
 
-func RemoveAllFromLogs(logPath string, bufferSize int, verbose bool) {
+func RemoveAllFromLogs(logPath string, bufferSize int, verbose int) {
 	files, err := ioutil.ReadDir(logPath)
 	if err != nil {
 		log.Fatal(err)
@@ -132,7 +133,7 @@ func RemoveAllFromLogs(logPath string, bufferSize int, verbose bool) {
 		RemoveFileFromLogs(logPath, file.Name(), bufferSize, verbose)
 	}
 }
-func RemoveFileFromLogs(logPath string, fileName string, bufferSize int, verbose bool) {
+func RemoveFileFromLogs(logPath string, fileName string, bufferSize int, verbose int) {
 	file, err := os.Open(filepath.Join(logPath, fileName))
 	if err != nil {
 		log.Println(err)
@@ -149,7 +150,7 @@ func RemoveFileFromLogs(logPath string, fileName string, bufferSize int, verbose
 	}
 	RemovePathsFromTM(lines, bufferSize, verbose)
 }
-func RemovePathsFromTM(paths []string, bufferSize int, verbose bool) {
+func RemovePathsFromTM(paths []string, bufferSize int, verbose int) {
 	defer utils.TimeTrack(time.Now(), "tmutil run", verbose)
 
 	check := make(chan string, bufferSize)
@@ -184,7 +185,7 @@ func RemovePathsFromTM(paths []string, bufferSize int, verbose bool) {
 	}
 	close(check)
 	<-finished
-	if verbose {
+	if verbose > 0 {
 		log.Printf("removed %d", removed)
 	}
 }

@@ -54,7 +54,7 @@ heptapod tm ls
 
 Dryrun the current rules, in verbose mode, also log speed and debug informations. (Potentially list nonexistent directories and files!)
 ```
-heptapod -v run -d
+heptapod -v 1 run -d
 ```
 
 To run the current rules, and add the dirs to the TM exclude list. Also writes exclude logs to `~/.heptapod/logs` (or the given `--logDir dir`) for easier revert.

@@ -6,7 +6,7 @@ import (
 
 var rulePath string
 var logDir string
-var verbose bool
+var verbose int
 var par int
 var buffer int
 
@@ -26,11 +26,11 @@ var LogDirFlag = &cli.StringFlag{
 	Destination: &logDir,
 }
 
-var VerboseFlag = &cli.BoolFlag{
+var VerboseFlag = &cli.IntFlag{
 	Name:        "verbose",
 	Aliases:     []string{"v"},
-	Value:       false,
-	Usage:       "prints out performance logs (and other logs in general)",
+	Value:       0,
+	Usage:       "prints out performance logs (and other logs in general) (0-4)",
 	Destination: &verbose,
 }
 

@@ -26,7 +26,7 @@ type WalkJob struct {
 	AlreadyFiltered []string
 }
 
-func Run(jobs []WalkJob, par int, bufferSize int, verbose bool) []string {
+func Run(jobs []WalkJob, par int, bufferSize int, verbose int) []string {
 	defer utils.TimeTrack(time.Now(), "walker run", verbose)
 	if len(jobs) == 0 {
 		return []string{}
@@ -64,13 +64,13 @@ func Run(jobs []WalkJob, par int, bufferSize int, verbose bool) []string {
 	return res
 }
 
-func worker(id int, spawn chan WalkJob, start chan bool, end chan []string, verbose bool) {
+func worker(id int, spawn chan WalkJob, start chan bool, end chan []string, verbose int) {
 	for j := range spawn {
 		walk(id, j.Rootpath, j.Walkers, j.AlreadyFiltered, spawn, start, end, verbose)
 	}
 }
 
-func walk(runnerId int, rootpath string, walkers []Walker, alreadyFiltered []string, spawn chan WalkJob, start chan bool, end chan []string, verbose bool) {
+func walk(runnerId int, rootpath string, walkers []Walker, alreadyFiltered []string, spawn chan WalkJob, start chan bool, end chan []string, verbose int) {
 	defer utils.TimeTrack(time.Now(), fmt.Sprintf("(runner-%d) walk on %s", runnerId, rootpath), verbose)
 	start <- true
 	hasNext := true
@@ -89,7 +89,7 @@ func walk(runnerId int, rootpath string, walkers []Walker, alreadyFiltered []str
 		next := l.Next
 		files, err := ioutil.ReadDir(l.Data)
 		if err != nil {
-			if (verbose) {
+			if verbose > 0 {
 				fmt.Println("!!! There was an error: ", err.Error())
 			}
 			if next == nil {
@@ -104,20 +104,24 @@ func walk(runnerId int, rootpath string, walkers []Walker, alreadyFiltered []str
 		globalIgnores := []string{}
 		for _, walker := range walkers {
 			r, i1, i2, name := walker(l.Data, files)
-			if(verbose && len(r) > 0) {
+			if verbose > 1 && len(r) > 0 {
 				fmt.Println("-----")
 				fmt.Println(name)
 				fmt.Println(l.Data)
 				for _, v := range r {
 					fmt.Println("\t", v)
 				}
-				fmt.Println("-")
-				for _, v := range i1 {
-					fmt.Println("\t", v)
-				}
-				fmt.Println("-")
-				for _, v := range i2 {
-					fmt.Println("\t", v)
+				if verbose > 2 {
+					fmt.Println("-")
+					for _, v := range i1 {
+						fmt.Println("\t", v)
+					}
+					if verbose > 3 {
+						fmt.Println("-")
+						for _, v := range i2 {
+							fmt.Println("\t", v)
+						}
+					}
 				}
 			}
 			res = res.Prepend(r)

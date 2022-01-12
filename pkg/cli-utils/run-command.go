@@ -31,11 +31,12 @@ var RunCommand = &cli.Command{
 			fmt.Print(strings.Join(res, "\r\n"))
 			fmt.Print("\n")
 		} else {
+			log.Printf("path detection started")
 			res := pkg.GetExcludedPaths(rulePath, par, buffer, verbose)
-			tmutil.AddPathsToTM(res, logDir, buffer, verbose)
-			if verbose {
-				log.Printf("total %d paths found\n", len(res))
-			}
+			log.Printf("total %d paths found\n", len(res))
+			log.Printf("tm excludes started")
+			added := tmutil.AddPathsToTM(res, logDir, buffer, verbose)
+			log.Printf("added %d paths to exclude", added)
 		}
 		return nil
 	},
