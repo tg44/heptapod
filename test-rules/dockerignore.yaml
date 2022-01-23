@@ -1,0 +1,9 @@
+name: "dockerignore"
+enabled: true
+searchPaths: ["~/dev"]
+ignorePaths: []
+ruleType: "ignore-file"
+ruleSettings:
+  fileName: ".dockerignore"
+  forceIncludePaths:
+    - ".env"

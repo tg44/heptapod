@@ -67,6 +67,13 @@ To revert all the previously added paths from the run-exclude-logs. (`prune -h` 
 heptapod prune -a
 ```
 
+### Dictionary
+ - search path - a path that we want to process
+ - ignore path - path that we don't process (further)
+ - exclude path - path that we don't want in our TM saves
+ - include path - path that we want in our TM saves
+ - ignore rule - a rule that parse git/docker ignore file format
+
 ### Notes from TM migrating to a new machine
 When you try to migrate your TM state to a new machine
 `xcode-select --install` may be needed. Somehow this is 
@@ -95,15 +102,17 @@ Every rule has a searchPaths, ignorePaths.
  - `type` is the ruletype
    - `file-trigger`
    - `regexp`
-   - `ignore-files`
+   - `ignore-file`
  - `settings` other type setting see below
 
-#### Ignore (not yet implemented)
+#### Ignore file (not yet implemented)
 Parses the `.gitignore` or `.dockerignore` files, and excludes its contents.
- - `forceAddPaths` are files that we add even if they would be otherwise excluded
+ - `forceIncludePaths` are files that we add even if they would be otherwise excluded
    - like `.gitignore` ignores `.env` files but we forcefully want to add them back 
  - `fileName`
    - `.gitignore` or `.dockerignore`
+ - devdocs:
+   - the problem with this, that you need to go into the whole subtree to do the parsings
 
 #### Regexp (not yet implemented)
 Ignores all files/folders with the given regexp. This can be slow!

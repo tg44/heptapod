@@ -1,0 +1,9 @@
+name: "gitignore"
+enabled: true
+searchPaths: ["~/dev"]
+ignorePaths: []
+ruleType: "ignore-file"
+ruleSettings:
+  fileName: ".gitignore"
+  forceIncludePaths:
+    - ".env"
