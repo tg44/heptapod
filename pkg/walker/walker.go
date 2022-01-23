@@ -66,13 +66,13 @@ func Run(jobs []WalkJob, par int, bufferSize int, verbose int) []string {
 
 func worker(id int, spawn chan WalkJob, start chan bool, end chan []string, verbose int) {
 	for j := range spawn {
+		start <- true
 		walk(id, j.Rootpath, j.Walkers, j.AlreadyFiltered, spawn, start, end, verbose)
 	}
 }
 
 func walk(runnerId int, rootpath string, walkers []Walker, alreadyFiltered []string, spawn chan WalkJob, start chan bool, end chan []string, verbose int) {
 	defer utils.TimeTrack(time.Now(), fmt.Sprintf("(runner-%d) walk on %s", runnerId, rootpath), verbose)
-	start <- true
 	hasNext := true
 	var res *utils.List = nil
 	path, err := utils.FixupPathsToHandleHome(rootpath)
@@ -112,13 +112,17 @@ func walk(runnerId int, rootpath string, walkers []Walker, alreadyFiltered []str
 					fmt.Println("\t", v)
 				}
 				if verbose > 2 {
-					fmt.Println("-")
+					fmt.Println("-localignore")
 					for _, v := range i1 {
 						fmt.Println("\t", v)
 					}
 					if verbose > 3 {
-						fmt.Println("-")
+						fmt.Println("-globalignore")
 						for _, v := range i2 {
+							fmt.Println("\t", v)
+						}
+						fmt.Println("-alreadyFiltered")
+						for _, v := range alreadyFiltered {
 							fmt.Println("\t", v)
 						}
 					}
@@ -144,9 +148,11 @@ func walk(runnerId int, rootpath string, walkers []Walker, alreadyFiltered []str
 							if len(keeps) == len(walkers) {
 								//if no ignore happened we go further with this runner
 								next = next.AddAsHead(f)
-							} else {
+							} else if len(keeps) > 0 {
 								//if some ignore happened we ignore the path, and spawn a new job with the nonignorant walkers
 								spawn <- WalkJob{f, keeps, alreadyFiltered}
+							} else {
+								//if keeps is empty we let the next be nil
 							}
 						}
 					}

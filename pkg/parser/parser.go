@@ -49,7 +49,7 @@ func ParseRulesFromDir(pathIn string) (*RuleGroups, error) {
 				errors = append(errors, file.Name())
 				continue
 			}
-			rt := parseRuleTypes(*rule)
+			rt, _ := parseRuleTypes(*rule)
 			if len(rt) == 0 {
 				typeErrors[file.Name()] = *rule
 			} else if !rule.Enabled {
@@ -65,53 +65,66 @@ func ParseRulesFromDir(pathIn string) (*RuleGroups, error) {
 
 func Parse(ruleFiles []string) []walker.WalkJob {
 	jobs := []walker.WalkJob{}
+	globalIgnores := []string{}
 	for _, f := range ruleFiles {
-		jobs = append(jobs, parse(f)...)
+		jobArr, ignores := parse(f)
+		jobs = append(jobs, jobArr...)
+		globalIgnores = append(globalIgnores, ignores...)
 	}
-	jobs = mergeJobs(jobs)
+	jobs = mergeJobs(jobs, globalIgnores)
 	return jobs
 }
 
-func parse(ruleFile string) []walker.WalkJob {
+func parse(ruleFile string) ([]walker.WalkJob, []string) {
 	rule, err := RuleParse(ruleFile)
 	if err != nil {
 		log.Println(err)
-		return []walker.WalkJob{}
+		return []walker.WalkJob{}, []string{}
 	}
-	if(rule == nil) {
+	if rule == nil {
 		log.Println(ruleFile, " has a strange error, we didn't get parse error, but it is not parsed either... Please report the content of the file to https://github.com/tg44/heptapod/issues/5")
-		return []walker.WalkJob{}
+		return []walker.WalkJob{}, []string{}
 	}
 	if !rule.Enabled {
-		return []walker.WalkJob{}
+		return []walker.WalkJob{}, []string{}
 	}
 
 	return parseRuleTypes(*rule)
 }
 
-func parseRuleTypes(rule Rule) []walker.WalkJob {
+func parseRuleTypes(rule Rule) ([]walker.WalkJob, []string) {
 	if rule.RuleType == "file-trigger" {
 		settings, err2 := fileTriggerSettingsParse(rule.RuleSettings)
 		if err2 != nil {
 			log.Println(err2)
-			return []walker.WalkJob{}
+			return []walker.WalkJob{}, []string{}
 		}
 		tasks := []walker.WalkJob{}
 		walkerFun := fileTriggerWalker(rule, *settings)
 		for _, p := range rule.SearchPaths {
 			tasks = append(tasks, walker.WalkJob{p, []walker.Walker{walkerFun}, []string{}})
 		}
-		return tasks
+		return tasks, []string{}
+	} else if rule.RuleType == "global" {
+		settings, err2 := globalSettingsParse(rule.RuleSettings)
+		if err2 != nil {
+			log.Println(err2)
+			return []walker.WalkJob{}, []string{}
+		}
+		tasks := []walker.WalkJob{}
+		walkerFun := globalWalker(rule, *settings)
+		tasks = append(tasks, walker.WalkJob{"/", []walker.Walker{walkerFun}, []string{}})
+		return tasks, getGlobalIgnore(*settings)
 	}
-	return []walker.WalkJob{}
+	return []walker.WalkJob{}, []string{}
 }
 
-func mergeJobs(works []walker.WalkJob) []walker.WalkJob {
+func mergeJobs(works []walker.WalkJob, globalIgnores []string) []walker.WalkJob {
 	paths := map[string]bool{}
 	for _, w := range works {
 		paths[w.Rootpath] = true
 	}
-	pathArr := []string{}
+	pathArr := globalIgnores
 	for k := range paths {
 		pathArr = append(pathArr, k)
 	}

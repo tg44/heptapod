@@ -1,0 +1,8 @@
+name: "node"
+enabled: true
+searchPaths: []
+ignorePaths: []
+ruleType: "global"
+ruleSettings:
+  path: "~/.npm"
+  handleWith: "ignore"
