@@ -1,0 +1,31 @@
+name: "node-multi"
+enabled: true
+searchPaths: []
+ignorePaths: []
+ruleType: "list"
+ruleSettings:
+  subRules:
+    - name: "library"
+      enabled: true
+      searchPaths: []
+      ignorePaths: []
+      ruleType: "global"
+      ruleSettings:
+        path: "~/Library"
+        handleWith: "ignore"
+    - name: "downloads"
+      enabled: false
+      searchPaths: [ ]
+      ignorePaths: [ ]
+      ruleType: "global"
+      ruleSettings:
+        path: "~/Downloads"
+        handleWith: "exclude"
+    - name: "trash"
+      enabled: false
+      searchPaths: [ ]
+      ignorePaths: [ ]
+      ruleType: "global"
+      ruleSettings:
+        path: "~/.Trash"
+        handleWith: "exclude"

@@ -23,9 +23,9 @@ func ParseFromDir(path string) ([]walker.WalkJob, error) {
 
 type RuleGroups struct {
 	FileErrors []string
-	TypeErrors map[string]Rule
-	Enabled    map[string]Rule
-	Disabled   map[string]Rule
+	TypeErrors []Rule
+	Enabled    []Rule
+	Disabled   []Rule
 }
 
 func ParseRulesFromDir(pathIn string) (*RuleGroups, error) {
@@ -38,9 +38,9 @@ func ParseRulesFromDir(pathIn string) (*RuleGroups, error) {
 		return nil, err
 	}
 	errors := []string{}
-	typeErrors := map[string]Rule{}
-	enabled := map[string]Rule{}
-	disabled := map[string]Rule{}
+	typeErrors := []Rule{}
+	enabled := []Rule{}
+	disabled := []Rule{}
 	for _, file := range files {
 		if strings.HasSuffix(file.Name(), ".yml") || strings.HasSuffix(file.Name(), ".yaml") {
 			fp := filepath.Join(path, file.Name())
@@ -49,13 +49,17 @@ func ParseRulesFromDir(pathIn string) (*RuleGroups, error) {
 				errors = append(errors, file.Name())
 				continue
 			}
-			rt, _ := parseRuleTypes(*rule)
+			rt, _, _ := parseRuleTypes(rule)
 			if len(rt) == 0 {
-				typeErrors[file.Name()] = *rule
-			} else if !rule.Enabled {
-				disabled[file.Name()] = *rule
+				typeErrors = append(typeErrors, *rule)
 			} else {
-				enabled[file.Name()] = *rule
+				for _, r := range rule.flattened() {
+					if !r.Enabled {
+						disabled = append(disabled, r)
+					} else {
+						enabled = append(enabled, r)
+					}
+				}
 			}
 		}
 	}
@@ -89,34 +93,42 @@ func parse(ruleFile string) ([]walker.WalkJob, []string) {
 		return []walker.WalkJob{}, []string{}
 	}
 
-	return parseRuleTypes(*rule)
+	w, i, _ := parseRuleTypes(rule)
+	return w, i
 }
 
-func parseRuleTypes(rule Rule) ([]walker.WalkJob, []string) {
+func parseRuleTypes(rule *Rule) ([]walker.WalkJob, []string, []Rule) {
 	if rule.RuleType == "file-trigger" {
 		settings, err2 := fileTriggerSettingsParse(rule.RuleSettings)
 		if err2 != nil {
 			log.Println(err2)
-			return []walker.WalkJob{}, []string{}
+			return []walker.WalkJob{}, []string{}, []Rule{}
 		}
 		tasks := []walker.WalkJob{}
-		walkerFun := fileTriggerWalker(rule, *settings)
+		walkerFun := fileTriggerWalker(*rule, *settings)
 		for _, p := range rule.SearchPaths {
 			tasks = append(tasks, walker.WalkJob{p, []walker.Walker{walkerFun}, []string{}})
 		}
-		return tasks, []string{}
+		return tasks, []string{}, []Rule{}
 	} else if rule.RuleType == "global" {
 		settings, err2 := globalSettingsParse(rule.RuleSettings)
 		if err2 != nil {
 			log.Println(err2)
-			return []walker.WalkJob{}, []string{}
+			return []walker.WalkJob{}, []string{}, []Rule{}
 		}
 		tasks := []walker.WalkJob{}
-		walkerFun := globalWalker(rule, *settings)
+		walkerFun := globalWalker(*rule, *settings)
 		tasks = append(tasks, walker.WalkJob{"/", []walker.Walker{walkerFun}, []string{}})
-		return tasks, getGlobalIgnore(*settings)
+		return tasks, getGlobalIgnore(*settings), []Rule{}
+	} else if rule.RuleType == "list" {
+		settings, err2 := listSettingsParse(rule.RuleSettings, parseRuleTypes)
+		if err2 != nil {
+			log.Println(err2)
+		}
+		rule.SubRules = settings.SubRules
+		return settings.walkers, settings.globalIgnores, settings.SubRules
 	}
-	return []walker.WalkJob{}, []string{}
+	return []walker.WalkJob{}, []string{}, []Rule{}
 }
 
 func mergeJobs(works []walker.WalkJob, globalIgnores []string) []walker.WalkJob {

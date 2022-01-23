@@ -68,11 +68,12 @@ heptapod prune -a
 ```
 
 ### Dictionary
- - search path - a path that we want to process
- - ignore path - path that we don't process (further)
- - exclude path - path that we don't want in our TM saves
- - include path - path that we want in our TM saves
- - ignore rule - a rule that parse git/docker ignore file format
+ - **path** - a file or a folder
+ - **search path** - a path that we want to process
+ - **ignore path** - path that we don't process (further)
+ - **exclude path** - path that we don't want in our TM saves
+ - **include path** - path that we want in our TM saves
+ - **ignore rule** - a rule that parse git/docker ignore file format
 
 ### Notes from TM migrating to a new machine
 When you try to migrate your TM state to a new machine
@@ -89,7 +90,7 @@ There are two ways to exclude a dir from backups;
   - keeps the given flag when moved
   - can not be reliably list them (`mdfind com_apple_backup_excludeItem = 'com.apple.backupd'` is a close call, but some folders are excluded by mdfind too)
 
-This tool excludes by flag! You can check any folder manually with `tmutil isexcluded`. If you delete a folder, it will be deleted with its flag. You don't need to clean up ever.
+This tool excludes by flag! You can check any folder manually with `tmutil isexcluded`. **If you delete a folder, it will be deleted with its flag. You don't need to clean up ever.**
 Also, you can only exclude nonexcluded files with tmutil, so we only add them if they are exists and if they are not already added.
 
 ### Rules
@@ -103,6 +104,8 @@ Every rule has a searchPaths, ignorePaths.
    - `file-trigger`
    - `regexp`
    - `ignore-file`
+   - `global`
+   - `list`
  - `settings` other type setting see below
 
 #### Ignore file (not yet implemented)
@@ -122,6 +125,24 @@ Ignores all files/folders with the given regexp. This can be slow!
 Ignores files/dirs based on other files existence, made for easy language dep ignores.
  - `fileTrigger` like `package.json` or `.git`
  - `excludePaths` like `node-modules` or `.`
+
+#### Global
+Globally ignores or excludes path (overrides other rules walk ignores).
+ - `path` the global path we want to evaluate (like `~/.npm`)
+ - `handleWith` a string enum
+    - `ignore` - ignores globally
+    - `exclude` - ignores globally and excludes from backups
+    - any other value - do nothing
+
+#### List
+Can group multiple rules to a single file.
+ - `subRules` the array of subRules (can be recursive with another `list`)
+
+Notes;
+ - while `rules ls` works, `enable`, `disable` and the path commands not working for the subrules, you need to edit the file manually
+ - if the list is disabled, all of it subs are handled as disables
+ - the group `searchPaths` and `ignorePaths` are currently do nothing
+   - probably this will change for easier customisations 
 
 ### Credits
  - [asimov](https://github.com/stevegrunwell/asimov)
@@ -145,9 +166,12 @@ done:
 - brew package
 - ghactions
 - rule manage commands (list/enable/disable/ignoreAdd/ignoreRemove)
+- global rule type
+- list rule type (for better rule grouping)
 
 todos:
-- handle global deps (m2, ivy, nvm, npm)
+- reorganise rules
+- fix the rule manage commands for lists
 - support tmignore functionality
 - support tmignore like funcionality with dockerignore
 - regexp pattern

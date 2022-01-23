@@ -13,7 +13,7 @@ import (
 )
 
 var RuleCommands = &cli.Command{
-	Name: "rules",
+	Name:    "rules",
 	Aliases: []string{},
 	Usage:   "rule related functions",
 	Subcommands: []*cli.Command{
@@ -111,7 +111,6 @@ func ruleEnable(pathIn string, enables []string) error {
 	return nil
 }
 
-
 func ruleDisable(pathIn string, enables []string) error {
 	path, err := utils.FixupPathsToHandleHome(pathIn)
 	if err != nil {
@@ -192,7 +191,7 @@ func ruleIgnoreRemoveAll(pathIn string, excludePaths []string) error {
 				continue
 			}
 			for _, n := range excludePaths {
-				rule.IgnorePaths = utils.Filter(rule.IgnorePaths, func(s string) bool {return s == n})
+				rule.IgnorePaths = utils.Filter(rule.IgnorePaths, func(s string) bool { return s == n })
 			}
 			err2 := parser.RuleWrite(*rule, fp)
 			if err2 != nil {
@@ -239,26 +238,26 @@ func writeErrorRules(paths []string) {
 	table.Render()
 }
 
-func writeTypeErrorRules(tes map[string]parser.Rule) {
+func writeTypeErrorRules(tes []parser.Rule) {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"path", "name", "type"})
 	table.SetBorder(false)
 
-	for k, v := range tes {
-		table.Append([]string{k, v.Name, v.RuleType})
+	for _, v := range tes {
+		table.Append([]string{v.FileName, v.Name, v.RuleType})
 	}
 
 	table.SetAutoMergeCells(false)
 	table.Render()
 }
 
-func writeRules(tes map[string]parser.Rule) {
+func writeRules(tes []parser.Rule) {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"path", "name", "type", "search", "ignore"})
 	table.SetBorder(false)
 
-	for k, v := range tes {
-		table.Append([]string{k, v.Name, v.RuleType, strings.Join(v.SearchPaths, ", "), strings.Join(v.IgnorePaths, ", ")})
+	for _, v := range tes {
+		table.Append([]string{v.FileName, v.Name, v.RuleType, strings.Join(v.SearchPaths, ", "), strings.Join(v.IgnorePaths, ", ")})
 	}
 
 	table.SetAutoMergeCells(false)

@@ -6,6 +6,7 @@ import (
 	"github.com/tg44/heptapod/pkg/tmutil"
 	"github.com/urfave/cli/v2"
 	"log"
+	"runtime"
 	"strings"
 )
 
@@ -25,6 +26,7 @@ var RunCommand = &cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
+		runtime.GOMAXPROCS(par)
 		if dry {
 			res := pkg.GetExcludedPaths(rulePath, par, buffer, verbose)
 			fmt.Println("-----")

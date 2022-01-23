@@ -1,0 +1,25 @@
+name: "node-multi"
+enabled: true
+searchPaths: []
+ignorePaths: []
+ruleType: "list"
+ruleSettings:
+  subRules:
+    - name: "node"
+      enabled: true
+      searchPaths: [ "~/dev" ]
+      ignorePaths: [ "~/dev/alpakka", "~/dev/akka" ]
+      ruleType: "file-trigger"
+      ruleSettings:
+        fileTrigger: "package.json"
+        excludePaths:
+          - "node_modules"
+    - name: "node-npm-global"
+      enabled: true
+      searchPaths: [ ]
+      ignorePaths: [ ]
+      ruleType: "global"
+      ruleSettings:
+        path: "~/.npm"
+        handleWith: "ignore"
+

@@ -6,6 +6,7 @@ import (
 	"github.com/tg44/heptapod/pkg/tmutil"
 	"github.com/urfave/cli/v2"
 	"log"
+	"runtime"
 )
 
 var file string
@@ -75,6 +76,7 @@ var TmPrune = &cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
+		runtime.GOMAXPROCS(par)
 		if current {
 			res := pkg.GetExcludedPaths(rulePath, par, buffer, verbose)
 			tmutil.RemovePathsFromTM(res, buffer, verbose)
