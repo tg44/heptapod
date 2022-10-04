@@ -3,6 +3,7 @@ package tmutil
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"github.com/tg44/heptapod/pkg/utils"
 	"io/ioutil"
 	"log"
@@ -25,7 +26,14 @@ func AddPathsToTM(paths []string, logDir string, bufferSize int, verbose int) in
 	currentTime := time.Now()
 	defer utils.TimeTrack(currentTime, "tmutil run", verbose)
 
-	logFile, err := os.Create(filepath.Join(logPath, currentTime.Format("2006-01-02_15:04:05")+".log"))
+	hostname, err := os.Hostname()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	logFormat := "%s_%s.log"
+
+	logFile, err := os.Create(filepath.Join(logPath, fmt.Sprintf(logFormat, hostname, currentTime.Format("2006-01-02_15:04:05"))))
 	if err != nil {
 		log.Fatal(err)
 	}
