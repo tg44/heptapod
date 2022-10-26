@@ -132,16 +132,51 @@ func removePath(path string) error {
 	return err
 }
 
-func RemoveAllFromLogs(logPath string, bufferSize int, verbose int) {
+func RemoveAllFromLogs(logDir string, bufferSize int, verbose int) {
+	logPath, err := utils.FixupPathsToHandleHome(logDir)
+	if err != nil {
+		log.Fatal(err)
+	}
 	files, err := ioutil.ReadDir(logPath)
 	if err != nil {
 		log.Fatal(err)
 	}
 	for _, file := range files {
+		if verbose > 2 {
+			log.Println("Processing: " + file.Name())
+		}
 		RemoveFileFromLogs(logPath, file.Name(), bufferSize, verbose)
 	}
 }
-func RemoveFileFromLogs(logPath string, fileName string, bufferSize int, verbose int) {
+
+func RemoveAllHostRelatedFromLogs(logDir string, bufferSize int, verbose int) {
+	logPath, err := utils.FixupPathsToHandleHome(logDir)
+	if err != nil {
+		log.Fatal(err)
+	}
+	files, err := ioutil.ReadDir(logPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	hostname, err := os.Hostname()
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, file := range files {
+		if strings.HasPrefix(file.Name(), hostname+"_") {
+			if verbose > 2 {
+				log.Println("Processing: " + file.Name())
+			}
+			RemoveFileFromLogs(logPath, file.Name(), bufferSize, verbose)
+		}
+	}
+}
+
+func RemoveFileFromLogs(logDir string, fileName string, bufferSize int, verbose int) {
+	logPath, err := utils.FixupPathsToHandleHome(logDir)
+	if err != nil {
+		log.Fatal(err)
+	}
 	file, err := os.Open(filepath.Join(logPath, fileName))
 	if err != nil {
 		log.Println(err)

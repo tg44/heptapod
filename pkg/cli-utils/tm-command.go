@@ -11,6 +11,7 @@ import (
 
 var file string
 var all bool
+var host bool
 var current bool
 
 var TmCommands = &cli.Command{
@@ -60,6 +61,13 @@ var TmPrune = &cli.Command{
 			Usage:       "remove all previously added exclude paths from the log dir",
 			Destination: &all,
 		},
+		&cli.BoolFlag{
+			Name:        "local",
+			Aliases:     []string{"l"},
+			Usage:       "remove all previously added exclude paths from the log dir prefixed by the current host",
+			Value:       false,
+			Destination: &host,
+		},
 		&cli.StringFlag{
 			Name:        "file",
 			Aliases:     []string{"f"},
@@ -82,6 +90,8 @@ var TmPrune = &cli.Command{
 			tmutil.RemovePathsFromTM(res, buffer, verbose)
 		} else if all {
 			tmutil.RemoveAllFromLogs(logDir, buffer, verbose)
+		} else if host {
+			tmutil.RemoveAllHostRelatedFromLogs(logDir, buffer, verbose)
 		} else if file != "" {
 			tmutil.RemoveFileFromLogs(logDir, file, buffer, verbose)
 		} else {
