@@ -10,7 +10,7 @@ import (
 )
 
 type FileTriggerSettings struct {
-	FileTrigger       string
+	FileTrigger  string
 	ExcludePaths []string
 }
 
@@ -35,7 +35,7 @@ func fileTriggerWalker(rule Rule, settings FileTriggerSettings) walker.Walker {
 			fixIgnorePaths = append(fixIgnorePaths, path)
 		}
 	}
-	return func(path string, subfiles []os.FileInfo) ([]string, []string, []string, string) {
+	return func(path string, subfiles []os.DirEntry) ([]string, []string, []string, string) {
 		if utils.ContainsFIA(subfiles, settings.FileTrigger) {
 			var ret []string
 			for _, f := range settings.ExcludePaths {

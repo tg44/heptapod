@@ -2,7 +2,7 @@ package utils
 
 import "os"
 
-func ContainsFIA(s []os.FileInfo, e string) bool {
+func ContainsFIA(s []os.DirEntry, e string) bool {
 	for _, a := range s {
 		if a.Name() == e {
 			return true
@@ -32,8 +32,8 @@ func Unique(arr []string) []string {
 	return list
 }
 
-//based on https://stackoverflow.com/a/48123201
-func Filter(arr []string, f func(string)bool) []string {
+// based on https://stackoverflow.com/a/48123201
+func Filter(arr []string, f func(string) bool) []string {
 	j := 0
 	q := make([]string, len(arr))
 	for _, n := range arr {

@@ -3,17 +3,16 @@ package walker
 import (
 	"fmt"
 	"github.com/tg44/heptapod/pkg/utils"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
 )
 
-//first ret is the excluding paths we found
-//second ret is the global ignore paths if we don't want other runners to go into it
-//third ret is the local ignore path if we don't want to go into it next time
-//last param is the name of the rule for verbose
-type Walker = func(path string, files []os.FileInfo) ([]string, []string, []string, string)
+// first ret is the excluding paths we found
+// second ret is the global ignore paths if we don't want other runners to go into it
+// third ret is the local ignore path if we don't want to go into it next time
+// last param is the name of the rule for verbose
+type Walker = func(path string, files []os.DirEntry) ([]string, []string, []string, string)
 
 type WalkerIgnores struct {
 	w            Walker
@@ -87,7 +86,7 @@ func walk(runnerId int, rootpath string, walkers []Walker, alreadyFiltered []str
 	l := &utils.List{path, nil}
 	for hasNext {
 		next := l.Next
-		files, err := ioutil.ReadDir(l.Data)
+		files, err := os.ReadDir(l.Data)
 		if err != nil {
 			if verbose > 0 {
 				fmt.Println("!!! There was an error: ", err.Error())

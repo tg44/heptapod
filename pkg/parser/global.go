@@ -55,7 +55,7 @@ func globalWalker(rule Rule, settings GlobalSettings) walker.Walker {
 		fixExcludePaths = fixIgnorePaths
 	}
 
-	return func(path string, subfiles []os.FileInfo) ([]string, []string, []string, string) {
+	return func(path string, subfiles []os.DirEntry) ([]string, []string, []string, string) {
 		var localIgnore []string
 		for _, f := range subfiles {
 			localIgnore = append(localIgnore, filepath.Join(path, f.Name()))

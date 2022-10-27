@@ -35,7 +35,7 @@ func ignoreTriggerWalker(rule Rule, settings IgnoreTriggerSettings) walker.Walke
 		}
 	}
 
-	return func(path string, subfiles []os.FileInfo) ([]string, []string, []string, string) {
+	return func(path string, subfiles []os.DirEntry) ([]string, []string, []string, string) {
 		/*
 			//here we should go in and handle all the subpaths by this given file
 			//not as trivial as it seemed at first bcs we need to implement something similar as the walker
