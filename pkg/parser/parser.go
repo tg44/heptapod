@@ -3,14 +3,14 @@ package parser
 import (
 	"github.com/tg44/heptapod/pkg/utils"
 	"github.com/tg44/heptapod/pkg/walker"
-	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"strings"
 )
 
 func ParseFromDir(path string) ([]walker.WalkJob, error) {
-	files, err := ioutil.ReadDir(path)
+	files, err := os.ReadDir(path)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func ParseRulesFromDir(pathIn string) (*RuleGroups, error) {
 	if err != nil {
 		return nil, err
 	}
-	files, err := ioutil.ReadDir(path)
+	files, err := os.ReadDir(path)
 	if err != nil {
 		return nil, err
 	}

@@ -6,7 +6,6 @@ import (
 	"github.com/tg44/heptapod/pkg/parser"
 	"github.com/tg44/heptapod/pkg/utils"
 	"github.com/urfave/cli/v2"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -85,7 +84,7 @@ func ruleEnable(pathIn string, enables []string) error {
 		fmt.Println("Path error.")
 		return err
 	}
-	files, err := ioutil.ReadDir(path)
+	files, err := os.ReadDir(path)
 	if err != nil {
 		fmt.Println("Dir read error.")
 		return err
@@ -117,7 +116,7 @@ func ruleDisable(pathIn string, enables []string) error {
 		fmt.Println("Path error.")
 		return err
 	}
-	files, err := ioutil.ReadDir(path)
+	files, err := os.ReadDir(path)
 	if err != nil {
 		fmt.Println("Dir read error.")
 		return err
@@ -149,7 +148,7 @@ func ruleIgnoreAddAll(pathIn string, excludePaths []string) error {
 		fmt.Println("Path error.")
 		return err
 	}
-	files, err := ioutil.ReadDir(path)
+	files, err := os.ReadDir(path)
 	if err != nil {
 		fmt.Println("Dir read error.")
 		return err
@@ -178,7 +177,7 @@ func ruleIgnoreRemoveAll(pathIn string, excludePaths []string) error {
 		fmt.Println("Path error.")
 		return err
 	}
-	files, err := ioutil.ReadDir(path)
+	files, err := os.ReadDir(path)
 	if err != nil {
 		fmt.Println("Dir read error.")
 		return err

@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/tg44/heptapod/pkg/utils"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -137,7 +136,7 @@ func RemoveAllFromLogs(logDir string, bufferSize int, verbose int) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	files, err := ioutil.ReadDir(logPath)
+	files, err := os.ReadDir(logPath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -154,7 +153,7 @@ func RemoveAllHostRelatedFromLogs(logDir string, bufferSize int, verbose int) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	files, err := ioutil.ReadDir(logPath)
+	files, err := os.ReadDir(logPath)
 	if err != nil {
 		log.Fatal(err)
 	}
