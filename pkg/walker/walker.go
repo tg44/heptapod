@@ -2,10 +2,11 @@ package walker
 
 import (
 	"fmt"
-	"github.com/tg44/heptapod/pkg/utils"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/tg44/heptapod/pkg/utils"
 )
 
 // first ret is the excluding paths we found
@@ -30,57 +31,43 @@ func Run(jobs []WalkJob, par int, bufferSize int, verbose int) []string {
 	if len(jobs) == 0 {
 		return []string{}
 	}
+
+	results := make(chan []string, bufferSize)
 	spawn := make(chan WalkJob, bufferSize)
-	start := make(chan bool, bufferSize)
-	end := make(chan []string)
 
+	maxId := 0
 	for _, j := range jobs {
-		spawn <- j
+		go walk(maxId, j.Rootpath, j.Walkers, j.AlreadyFiltered, results, spawn, verbose)
+		maxId += 1
 	}
 
-	for w := 1; w <= par; w++ {
-		go worker(w, spawn, start, end, verbose)
-	}
-
-	res := []string{}
-	//wait loop
-	<-start
-	for e := range end {
-		more := false
+	globalResult := []string{}
+	expectedResultCount := len(jobs)
+	for expectedResultCount > 0 {
 		select {
-		case <-start:
-			more = true
-		default:
-			more = false
+		case singleResult := <-results:
+			globalResult = append(globalResult, singleResult...)
+			expectedResultCount -= 1
+		case j := <-spawn:
+			go walk(maxId, j.Rootpath, j.Walkers, j.AlreadyFiltered, results, spawn, verbose)
+			maxId += 1
+			expectedResultCount += 1
 		}
-		if !more {
-			close(start)
-			close(end)
-			close(spawn)
-		}
-		res = append(res, e...)
 	}
-	return res
+	return globalResult
 }
 
-func worker(id int, spawn chan WalkJob, start chan bool, end chan []string, verbose int) {
-	for j := range spawn {
-		start <- true
-		walk(id, j.Rootpath, j.Walkers, j.AlreadyFiltered, spawn, start, end, verbose)
-	}
-}
-
-func walk(runnerId int, rootpath string, walkers []Walker, alreadyFiltered []string, spawn chan WalkJob, start chan bool, end chan []string, verbose int) {
+func walk(runnerId int, rootpath string, walkers []Walker, alreadyFiltered []string, results chan []string, moreJobs chan WalkJob, verbose int) {
 	defer utils.TimeTrack(time.Now(), fmt.Sprintf("(runner-%d) walk on %s", runnerId, rootpath), verbose)
 	hasNext := true
 	var res *utils.List = nil
 	path, err := utils.FixupPathsToHandleHome(rootpath)
 	if err != nil {
-		end <- []string{}
+		results <- []string{}
 		return
 	}
 	if len(walkers) == 0 {
-		end <- []string{}
+		results <- []string{}
 		return
 	}
 	l := &utils.List{path, nil}
@@ -149,7 +136,7 @@ func walk(runnerId int, rootpath string, walkers []Walker, alreadyFiltered []str
 								next = next.AddAsHead(f)
 							} else if len(keeps) > 0 {
 								//if some ignore happened we ignore the path, and spawn a new job with the nonignorant walkers
-								spawn <- WalkJob{f, keeps, alreadyFiltered}
+								moreJobs <- WalkJob{f, keeps, alreadyFiltered}
 							} else {
 								//if keeps is empty we let the next be nil
 							}
@@ -165,5 +152,5 @@ func walk(runnerId int, rootpath string, walkers []Walker, alreadyFiltered []str
 			l = next
 		}
 	}
-	end <- res.ToArray()
+	results <- res.ToArray()
 }
