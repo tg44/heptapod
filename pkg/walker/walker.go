@@ -28,30 +28,31 @@ type WalkJob struct {
 
 func Run(jobs []WalkJob, par int, bufferSize int, verbose int) []string {
 	defer utils.TimeTrack(time.Now(), "walker run", verbose)
-	if len(jobs) == 0 {
+	initialJobCount := len(jobs)
+	if initialJobCount == 0 {
 		return []string{}
 	}
 
 	results := make(chan []string, bufferSize)
 	spawn := make(chan WalkJob, bufferSize)
 
-	maxId := 0
-	for _, j := range jobs {
-		go walk(maxId, j.Rootpath, j.Walkers, j.AlreadyFiltered, results, spawn, verbose)
-		maxId += 1
+	for _, job := range jobs {
+		spawn <- job
 	}
 
 	globalResult := []string{}
-	expectedResultCount := len(jobs)
-	for expectedResultCount > 0 {
+	executedJobs := 0
+	expectedResultCount := initialJobCount
+	maxId := 0
+	for expectedResultCount > 0 || executedJobs < initialJobCount {
 		select {
 		case singleResult := <-results:
 			globalResult = append(globalResult, singleResult...)
 			expectedResultCount -= 1
 		case j := <-spawn:
 			go walk(maxId, j.Rootpath, j.Walkers, j.AlreadyFiltered, results, spawn, verbose)
+			executedJobs += 1
 			maxId += 1
-			expectedResultCount += 1
 		}
 	}
 	return globalResult
