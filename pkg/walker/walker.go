@@ -34,31 +34,38 @@ func Run(jobs []WalkJob, par int, bufferSize int, verbose int) []string {
 	}
 
 	results := make(chan []string, bufferSize)
+	jobQueue := make(chan WalkJob, bufferSize)
 	spawn := make(chan WalkJob, bufferSize)
 
-	for _, job := range jobs {
-		spawn <- job
+	for i, job := range jobs {
+		if (i + 1) <= par {
+			spawn <- job
+		} else {
+			jobQueue <- job
+		}
 	}
 
 	globalResult := []string{}
-	executedJobs := 0
 	expectedResultCount := initialJobCount
 	maxId := 0
-	for expectedResultCount > 0 || executedJobs < initialJobCount {
+	for expectedResultCount > 0 {
 		select {
 		case singleResult := <-results:
 			globalResult = append(globalResult, singleResult...)
 			expectedResultCount -= 1
+			if len(jobQueue) > 0 {
+				// check then act is safe since only this one thread received from jobQueue
+				spawn <- <-jobQueue
+			}
 		case j := <-spawn:
-			go walk(maxId, j.Rootpath, j.Walkers, j.AlreadyFiltered, results, spawn, verbose)
-			executedJobs += 1
+			go walk(maxId, j.Rootpath, j.Walkers, j.AlreadyFiltered, results, jobQueue, verbose)
 			maxId += 1
 		}
 	}
 	return globalResult
 }
 
-func walk(runnerId int, rootpath string, walkers []Walker, alreadyFiltered []string, results chan []string, moreJobs chan WalkJob, verbose int) {
+func walk(runnerId int, rootpath string, walkers []Walker, alreadyFiltered []string, results chan []string, jobQueue chan WalkJob, verbose int) {
 	defer utils.TimeTrack(time.Now(), fmt.Sprintf("(runner-%d) walk on %s", runnerId, rootpath), verbose)
 	hasNext := true
 	var res *utils.List = nil
@@ -137,7 +144,7 @@ func walk(runnerId int, rootpath string, walkers []Walker, alreadyFiltered []str
 								next = next.AddAsHead(f)
 							} else if len(keeps) > 0 {
 								//if some ignore happened we ignore the path, and spawn a new job with the nonignorant walkers
-								moreJobs <- WalkJob{f, keeps, alreadyFiltered}
+								jobQueue <- WalkJob{f, keeps, alreadyFiltered}
 							} else {
 								//if keeps is empty we let the next be nil
 							}
