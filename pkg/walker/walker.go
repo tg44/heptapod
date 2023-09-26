@@ -36,9 +36,11 @@ func Run(jobs []WalkJob, par int, bufferSize int, verbose int) []string {
 	results := make(chan []string, bufferSize)
 	jobQueue := make(chan WalkJob, bufferSize)
 	spawn := make(chan WalkJob, bufferSize)
+	runningJobCount := 0
 
 	for i, job := range jobs {
 		if (i + 1) <= par {
+			runningJobCount += 1
 			spawn <- job
 		} else {
 			jobQueue <- job
@@ -46,15 +48,15 @@ func Run(jobs []WalkJob, par int, bufferSize int, verbose int) []string {
 	}
 
 	globalResult := []string{}
-	expectedResultCount := initialJobCount
 	maxId := 0
-	for expectedResultCount > 0 {
+	for runningJobCount > 0 {
 		select {
 		case singleResult := <-results:
 			globalResult = append(globalResult, singleResult...)
-			expectedResultCount -= 1
+			runningJobCount -= 1
 			if len(jobQueue) > 0 {
 				// check then act is safe since only this one thread received from jobQueue
+				runningJobCount += 1
 				spawn <- <-jobQueue
 			}
 		case j := <-spawn:
