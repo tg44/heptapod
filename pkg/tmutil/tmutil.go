@@ -4,13 +4,14 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"github.com/tg44/heptapod/pkg/utils"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/tg44/heptapod/pkg/utils"
 )
 
 func AddPathsToTM(paths []string, logDir string, bufferSize int, verbose int) int {
@@ -101,6 +102,19 @@ func checkPath(path string, verbose int) (bool, error) {
 	return !strings.Contains(s, "[Excluded]"), nil
 }
 
+func printTmutilError(path string, out bytes.Buffer, outErr bytes.Buffer) {
+	log.Println(out.String())
+	var errorMessageToPrint string
+	errorString := outErr.String()
+	_, found := strings.CutPrefix(errorString, path+": Error (-50)")
+	if found {
+		errorMessageToPrint = path + ": Please make sure you have write permissions to that file or directory."
+	} else {
+		errorMessageToPrint = errorString
+	}
+	log.Println(errorMessageToPrint)
+}
+
 func addPath(path string, logfile *os.File) error {
 	cmd := exec.Command("tmutil", "addexclusion", path)
 	var out bytes.Buffer
@@ -109,8 +123,7 @@ func addPath(path string, logfile *os.File) error {
 	cmd.Stderr = &outErr
 	err := cmd.Run()
 	if err != nil {
-		log.Println(out.String())
-		log.Println(outErr.String())
+		printTmutilError(path, out, outErr)
 		return err
 	}
 	_, _ = logfile.WriteString(path + "\r\n")
@@ -125,8 +138,7 @@ func removePath(path string) error {
 	cmd.Stderr = &outErr
 	err := cmd.Run()
 	if err != nil {
-		log.Println(out.String())
-		log.Println(outErr.String())
+		printTmutilError(path, out, outErr)
 	}
 	return err
 }
