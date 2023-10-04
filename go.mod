@@ -1,6 +1,6 @@
 module github.com/tg44/heptapod
 
-go 1.17
+go 1.21.2
 
 require (
 	github.com/olekukonko/tablewriter v0.0.5
