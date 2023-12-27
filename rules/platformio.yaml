@@ -1,0 +1,9 @@
+name: "platformio"
+enabled: true
+searchPaths: ["~"]
+ignorePaths: []
+ruleType: "file-trigger"
+ruleSettings:
+  fileTrigger: "platformio.ini"
+  excludePaths:
+    - ".pio"
