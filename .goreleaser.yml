@@ -80,3 +80,8 @@ brews:
     install: |
       bin.install "heptapod"
       prefix.install Dir["rules"]
+
+    service: |
+      run [opt_bin/"heptapod", "run"]
+      run_type :cron
+      cron "0 * * * *"
