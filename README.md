@@ -78,7 +78,7 @@ heptapod prune -a
 ### Notes from TM migrating to a new machine
 When you try to migrate your TM state to a new machine
 `xcode-select --install` may be needed. Somehow this is 
-sometimes not migrating as you thought it will.
+sometimes not migrated as you thought it would be.
 
 ### Notes from TM in general
 There are two ways to exclude a dir from backups;
